@@ -18,6 +18,7 @@ const uuid_1 = require("uuid");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const sql_config_1 = require("../Config/sql.config");
+const dbhelper_1 = __importDefault(require("../Dbhelper/dbhelper"));
 const user = [];
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -80,6 +81,9 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(200).json({
             users: allusers
         });
+        // return res.status(200).json({
+        //     users:allusers
+        //  })
     }
     catch (error) {
         return res.json({ error });
@@ -89,14 +93,30 @@ exports.getUsers = getUsers;
 const getOneUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
-        const pool = yield mssql_1.default.connect(sql_config_1.sqlConfig);
-        let user = (yield pool.request().input("user_id", id).execute('getOneUser')).recordset;
-        return res.json({
-            user: user
-        });
+        // const pool = await mssql.connect(sqlConfig)
+        // let user = (await pool.request().input("user_id", id).execute('getOneUser')).recordset
+        let user = (yield dbhelper_1.default.execute("getOneUser", { user_id: id })).recordset;
+        //     return res.json({
+        //         user:user
+        //     })
+        // } catch (error) {
+        //     return res.json({ error })
+        // }
+        if (user.length > 0) {
+            return res.json({
+                user
+            });
+        }
+        else {
+            return res.json({
+                message: "No user found"
+            });
+        }
     }
     catch (error) {
-        return res.json({ error });
+        return res.json({
+            error: error.originalError.info.message
+        });
     }
 });
 exports.getOneUser = getOneUser;

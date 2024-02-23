@@ -13,7 +13,7 @@ app.use((error:Error, req:Request, res:Response, next:NextFunction)=>{
     res.json({message:error.message})
 })
 
-let port: number = 5000;
+let port: number = 5100;
 app.listen(port, ()=>{
     console.log(`Server running on port ${port}`);
 })

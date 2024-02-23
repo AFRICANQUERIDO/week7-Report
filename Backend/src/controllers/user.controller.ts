@@ -1,10 +1,12 @@
-import mssql from 'mssql'
+import mssql, { connect } from 'mssql'
 import {v4} from 'uuid'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { User } from '../Interface/userInterface'
 import { sqlConfig } from '../Config/sql.config'
 import { Response, Request } from 'express'
+import Connection from '../Dbhelper/dbhelper'
+
 
 const user: User[] =[]
 
@@ -87,6 +89,9 @@ export const getUsers = async (req: Request, res: Response) => {
         return res.status(200).json({
            users:allusers
         })
+        // return res.status(200).json({
+        //     users:allusers
+        //  })
     } catch (error) {
         return res.json({ error })
     }
@@ -96,16 +101,31 @@ export const getOneUser = async (req: Request, res: Response) => {
     try {
         const id = req.params.id
 
-        const pool = await mssql.connect(sqlConfig)
+        // const pool = await mssql.connect(sqlConfig)
 
-        let user = (await pool.request().input("user_id", id).execute('getOneUser')).recordset
-
+        // let user = (await pool.request().input("user_id", id).execute('getOneUser')).recordset
+        let user = (await Connection.execute("getOneUser", {user_id:id})).recordset
+    //     return res.json({
+    //         user:user
+    //     })
+    // } catch (error) {
+    //     return res.json({ error })
+    // }
+    if(user.length > 0){
         return res.json({
-            user:user
+            user
         })
-    } catch (error) {
-        return res.json({ error })
+    }else{
+        return res.json({
+            message: "No user found"
+        })
     }
+    
+} catch (error:any) {
+    return res.json({
+        error: error.originalError.info.message
+    })
+}
 }
 
 export const updateUser = async (req: Request, res: Response) => {

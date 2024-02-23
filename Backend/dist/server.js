@@ -36,7 +36,7 @@ app.use('/users', user_router_1.default);
 app.use((error, req, res, next) => {
     res.json({ message: error.message });
 });
-let port = 5000;
+let port = 5100;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
