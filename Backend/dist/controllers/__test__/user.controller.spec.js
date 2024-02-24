@@ -50,102 +50,70 @@ describe("User Registration", () => {
         expect(res.json).toHaveBeenCalledWith({ message: "User created successfully" });
     }));
     it("gets a user", () => __awaiter(void 0, void 0, void 0, function* () {
+        const mockedresult = [{
+                user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89',
+                cohort_no: '22',
+                fname: 'Jane',
+                lname: 'Ngene',
+                email: 'janengene12@gmail.com',
+                phone_no: '0700000',
+                password: '12345'
+            }];
         const req = {
             params: {
                 user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89'
             }
         };
+        // res ={
+        //     json:jest.fn().mockReturnThis(),
+        //     status:jest.fn().mockReturnThis()
+        // }
         // Mocking Connection.execute
         dbhelper_1.default.execute.mockResolvedValueOnce({
-            recordset: {}
+            recordset: mockedresult[0]
         });
         yield (0, user_controller_1.getOneUser)(req, res);
         expect(res.json).toHaveBeenCalledWith({
-            user: { /* mocked user recordset */}
+            user: mockedresult[0]
         });
     }));
-    // Uncommented section, assuming you want to complete the test for getUsers
-    it('successfully fetches all users', () => __awaiter(void 0, void 0, void 0, function* () {
-        const mockedExecute = jest.fn().mockResolvedValueOnce({ rowsAffected: [1] });
+    it('Successfully updates a user', () => __awaiter(void 0, void 0, void 0, function* () {
+        const req = {
+            body: {
+                cohort_no: '22',
+                fname: 'Jane',
+                lname: 'Ngene',
+                email: 'janengene12@gmail.com',
+                phone_no: '0700000',
+                password: '12345'
+            }
+        };
+        const mockedInput = jest.fn().mockReturnThis();
+        const mockedExecute = jest.fn().mockResolvedValue({ rowsAffected: [1] });
         const mockedRequest = {
+            input: mockedInput,
             execute: mockedExecute
         };
         const mockedPool = {
-            request: jest.fn().mockReturnValueOnce(mockedRequest)
+            requset: jest.fn().mockResolvedValue(mockedRequest)
         };
-        jest.spyOn(mssql_1.default, 'connect').mockResolvedValueOnce(mockedPool);
-        // await getUsers(res as any);
-        // Add expectations for the function behavior
-        // expect(res.json).toHaveBeenCalledWith(/* expected result for all users */);
-        expect(res.status).toHaveBeenCalledWith(200);
+        yield (0, user_controller_1.updateUser)(req, res);
+        jest.spyOn(mssql_1.default, 'connect').mockResolvedValue(mockedPool);
+        expect(res.status(200).json).toHaveBeenCalledWith({ message: "Details updated successfully" });
+    }));
+    it('sucessfully deletes a user', () => __awaiter(void 0, void 0, void 0, function* () {
+        const req = { body: {} };
+        const mockedInput = jest.fn().mockReturnThis();
+        const mockedExecute = jest.fn().mockResolvedValue({ rowsAffected: [1] });
+        const mockedRequest = {
+            input: mockedInput,
+            execute: mockedExecute
+        };
+        const mockedPool = {
+            request: jest.fn().mockReturnValue(mockedRequest)
+        };
+        jest.spyOn(mssql_1.default, 'connect').mockRejectedValueOnce(mockedPool);
+        yield (0, user_controller_1.deleteUser)(req, res);
+        expect(res.status(200).json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
     }));
 });
-// import bcrypt from 'bcrypt'
-// import mssql from 'mssql'
-// import { createUser, getOneUser, getUsers } from '../user.controller'
-// import Connection from '../../Dbhelper/dbhelper';
-// // jest.mock(dbhelper)
-// describe("User Registration", ()=>{
-//     let res: any;
-//     beforeEach(()=>{
-//         res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn().mockReturnThis()
-//         }
-//     })
-//     it('successfully registers a user', async()=>{
-//         const req ={
-//             body:{
-//                 cohort_no: "1",
-//                 fname: "Jane",
-//                 lname: "Ngene",
-//                 email: "janengene12@gmail.com",
-//                 phone_no: "0700000",
-//                 password: "12345"
-//             }
-//         }
-//         jest.spyOn(bcrypt, 'hash').mockResolvedValueOnce("qwetjdPwdkjshghgksjgkj" as never)
-//         const mockedInput = jest.fn().mockReturnThis()
-//         const mockedExecute = jest.fn().mockResolvedValue({rowsAffected: [1]})
-//         const mockedRequest = {
-//             input: mockedInput,
-//             execute: mockedExecute
-//         }
-//         const mockedPool = {
-//             request: jest.fn().mockReturnValue(mockedRequest)
-//         }
-//         jest.spyOn(mssql, 'connect').mockResolvedValue(mockedPool as never)
-//         await createUser(req as any, res)
-//         expect(res.json).toHaveBeenCalledWith({message: "User created successfully"})
-//         // expect(res.status).toHaveBeenCalledWith(200)
-// })
-//     it("gets a user", async()=>{
-//         const req = {
-//             params:{
-//                 user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89'
-//             }
-//         };
-//         (Connection.execute as jest.Mock).mockResolvedValueOnce({
-//             recordset:user.recordset
-//         })
-//         await getOneUser(req as any, res)
-//         expect(res.json).toHaveBeenCalledWith({
-//             user:user.recordset
-//             }) 
-//     })
-//     // it('successfully fetches one user', async()=>{
-//     //     await getUsers( res as any);
-//     //     const mockedExecute = jest.fn().mockResolvedValue({rowsAffected: [1]})
-//     //     expect(mockedExecute).toHaveBeenCalledWith('getAllUsers');
-//     //     const mockedRequest = {
-//     //         execute: mockedExecute
-//     //     }
-//     //     const mockedPool = {
-//     //         request: jest.fn().mockReturnValue(mockedRequest)
-//     //     }
-//     //     jest.spyOn(mssql, 'connect').mockResolvedValue(mockedPool as never)
-//     //     await getUsers(res)
-//     //     // expect(res.json).toHaveBeenCalledWith({message: "User created successfully"})
-//     //     expect(res.status).toHaveBeenCalledWith(200)
-//     })
-// })

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import mssql from 'mssql';
-import { createUser, deleteUser, getOneUser, getUsers, updateUser } from '../user.controller';
+import { createUser, deleteUser, getOneUser, updateUser } from '../user.controller';
 import Connection from '../../Dbhelper/dbhelper';
 
 describe("User Registration", () => {
@@ -45,15 +45,6 @@ describe("User Registration", () => {
     });
 
     it("gets a user", async () => {
-        const req = {
-            params: {
-                user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89'
-            }
-        };
-        res ={
-            json:jest.fn(),
-            status:jest.fn().mockReturnThis()
-        }
         const mockedresult = [{
             user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89',
             cohort_no: '22',
@@ -63,6 +54,15 @@ describe("User Registration", () => {
             phone_no: '0700000',
             password: '12345'
         }]
+        const req = {
+            params: {
+                user_id: '7hhsad-6e5cnbsnv-4hgdb78-wdb96hg5d-8a2w6469bi89'
+            }
+        };
+        // res ={
+        //     json:jest.fn().mockReturnThis(),
+        //     status:jest.fn().mockReturnThis()
+        // }
             // Mocking Connection.execute
             (Connection.execute as jest.Mock).mockResolvedValueOnce({
                 recordset: mockedresult[0]
